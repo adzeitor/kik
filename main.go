@@ -1,12 +1,11 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 	"strconv"
-	"unicode/utf8"
 	"os"
+	"encoding/json"
 )
 
 var (
@@ -14,6 +13,10 @@ var (
 	bind      string
 	maxLength int
 )
+
+type Answer struct {
+	Str string `json:"str"`
+}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -46,8 +49,32 @@ func main() {
 			ch = " "
 		}
 
-		leftPad(str, len, ch, w)
+		FLeftPad(w, str, len, ch)
 	})
+
+	http.HandleFunc("/left.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+		str := r.FormValue("str")
+		len, _ := strconv.Atoi(r.FormValue("len"))
+
+		if len > maxLength {
+			len = maxLength
+		}
+
+		ch := r.FormValue("ch")
+		if ch == "" {
+			ch = " "
+		}
+
+		padded := LeftPad(str, len, ch)
+
+		res, _ := json.Marshal(Answer{padded})
+		w.Write(res)
+	})
+
+
+
 
 	http.HandleFunc("/right", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -64,46 +91,30 @@ func main() {
 			ch = " "
 		}
 
-		rightPad(str, len, ch, w)
+		FRightPad(w, str, len, ch)
+	})
+
+	http.HandleFunc("/right.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+		str := r.FormValue("str")
+		len, _ := strconv.Atoi(r.FormValue("len"))
+
+		if len > maxLength {
+			len = maxLength
+		}
+
+		ch := r.FormValue("ch")
+		if ch == "" {
+			ch = " "
+		}
+
+		padded := RightPad(str, len, ch)
+
+		res, _ := json.Marshal(Answer{padded})
+		w.Write(res)
 	})
 
 	log.Printf("Served at %s:%s", bind, port)
 	log.Fatal(http.ListenAndServe(bind + ":" + port, nil))
-}
-
-func rightPad(str string, len int, ch string, w io.Writer) {
-	strlen := utf8.RuneCountInString(str)
-
-	w.Write([]byte(str))
-
-	buf := make([]byte, 3)
-	for {
-		for _, x := range ch {
-			if strlen >= len {
-				return
-			}
-
-			utf8.EncodeRune(buf, x)
-			w.Write(buf)
-			strlen++
-		}
-	}
-}
-
-func leftPad(str string, len int, ch string, w io.Writer) {
-	strlen := utf8.RuneCountInString(str)
-
-	buf := make([]byte, 3)
-	for {
-		for _, x := range ch {
-			if strlen >= len {
-				w.Write([]byte(str))
-				return
-			}
-
-			utf8.EncodeRune(buf, x)
-			w.Write(buf)
-			strlen++
-		}
-	}
 }
