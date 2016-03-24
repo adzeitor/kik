@@ -1,11 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"os"
-	"encoding/json"
+	"strconv"
 )
 
 var (
@@ -26,7 +26,7 @@ func main() {
 
 	bind := os.Getenv("BIND")
 
-	maxLength,_ := strconv.Atoi(os.Getenv("MAXLENGTH"))
+	maxLength, _ := strconv.Atoi(os.Getenv("MAXLENGTH"))
 	if maxLength <= 0 {
 		// free version limit
 		maxLength = 2048
@@ -73,9 +73,6 @@ func main() {
 		w.Write(res)
 	})
 
-
-
-
 	http.HandleFunc("/right", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
@@ -116,5 +113,5 @@ func main() {
 	})
 
 	log.Printf("Served at %s:%s", bind, port)
-	log.Fatal(http.ListenAndServe(bind + ":" + port, nil))
+	log.Fatal(http.ListenAndServe(bind+":"+port, nil))
 }

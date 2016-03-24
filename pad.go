@@ -1,11 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"io"
 	"unicode/utf8"
-	"bytes"
 )
-
 
 func LeftPad(str string, len int, ch string) string {
 	var buf bytes.Buffer
@@ -42,8 +41,6 @@ func RightPad(str string, len int, ch string) string {
 		}
 	}
 }
-
-
 
 func FRightPad(w io.Writer, str string, len int, ch string) {
 	strlen := utf8.RuneCountInString(str)
