@@ -1,13 +1,12 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"unicode/utf8"
+	"os"
 )
 
 var (
@@ -16,14 +15,19 @@ var (
 	maxLength int
 )
 
-func init() {
-	flag.IntVar(&port, "port", 3000, "web server port(3000 for default)")
-	flag.IntVar(&maxLength, "maxlength", 2048, "max length")
-	flag.StringVar(&bind, "bind", "127.0.0.1", "binding (127.0.0.1 for default) ")
-}
-
 func main() {
-	flag.Parse()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
+	bind := os.Getenv("BIND")
+
+	maxLength,_ := strconv.Atoi(os.Getenv("MAXLENGTH"))
+	if maxLength <= 0 {
+		// free version limit
+		maxLength = 2048
+	}
 
 	// for compatibility with api.left-pad.io
 	// ?str=paddin%27%20oswalt&len=68&ch=@
@@ -63,8 +67,8 @@ func main() {
 		rightPad(str, len, ch, w)
 	})
 
-	log.Printf("Served at %s:%d", bind, port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", bind, port), nil))
+	log.Printf("Served at %s:%s", bind, port)
+	log.Fatal(http.ListenAndServe(bind + ":" + port, nil))
 }
 
 func leftPad(str string, len int, ch string, w io.Writer) {
