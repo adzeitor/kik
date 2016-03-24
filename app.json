@@ -1,0 +1,7 @@
+{
+    "name": "kik",
+    "description": "left-pad right-pad as a service",
+    "repository": "https://github.com/adzeitor/kik",
+    "image": "heroku/go",
+    "keywords": ["kik", "golang"]
+}
