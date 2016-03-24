@@ -71,7 +71,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(bind + ":" + port, nil))
 }
 
-func leftPad(str string, len int, ch string, w io.Writer) {
+func rightPad(str string, len int, ch string, w io.Writer) {
 	strlen := utf8.RuneCountInString(str)
 
 	w.Write([]byte(str))
@@ -90,7 +90,7 @@ func leftPad(str string, len int, ch string, w io.Writer) {
 	}
 }
 
-func rightPad(str string, len int, ch string, w io.Writer) {
+func leftPad(str string, len int, ch string, w io.Writer) {
 	strlen := utf8.RuneCountInString(str)
 
 	buf := make([]byte, 3)
@@ -106,5 +106,4 @@ func rightPad(str string, len int, ch string, w io.Writer) {
 			strlen++
 		}
 	}
-
 }
